@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import type { SectionFields } from "../types/contentful";
 
 type FormState = {
   firstName: string;
@@ -17,7 +18,100 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // тільки літери: укр + лат (без пробілів/дефісів/цифр)
 const NAME_RE = /^[A-Za-zА-Яа-яІіЇїЄєҐґ]+$/;
 
-export default function Contact() {
+function normalize(s?: string) {
+  return (s ?? "").trim();
+}
+
+function splitLines(s?: string) {
+  return normalize(s)
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+}
+
+function looksLikeEmail(s: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+}
+
+function looksLikePhone(s: string) {
+  const digits = s.replace(/\D/g, "");
+  return digits.length >= 7;
+}
+
+function toTelHref(s: string) {
+  const cleaned = s.replace(/[^\d+]/g, "");
+  if (cleaned.startsWith("+")) return cleaned;
+  const digits = s.replace(/\D/g, "");
+  return digits ? `+${digits}` : s;
+}
+
+function ContactsBlock({
+  className = "",
+  lines,
+}: {
+  className?: string;
+  lines: string[];
+}) {
+  return (
+    <div className={`bg-[#eceffa] p-8 ${className}`}>
+      <h3 className="text-lg font-semibold text-gray-900">Контакти:</h3>
+
+      <div className="mt-3 space-y-3 text-lg text-gray-900">
+        {lines.map((l, i) => {
+          if (looksLikeEmail(l)) {
+            return (
+              <p key={i}>
+                <a
+                  href={`mailto:${l}`}
+                  className="hover:text-[#2c5cf2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2c5cf2]"
+                  aria-label={`Написати на email ${l}`}
+                >
+                  {l}
+                </a>
+              </p>
+            );
+          }
+
+          if (looksLikePhone(l)) {
+            return (
+              <p key={i}>
+                <a
+                  href={`tel:${toTelHref(l)}`}
+                  className="hover:text-[#2c5cf2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2c5cf2]"
+                  aria-label={`Зателефонувати: ${l}`}
+                >
+                  {l}
+                </a>
+              </p>
+            );
+          }
+
+          return <p key={i}>{l}</p>;
+        })}
+      </div>
+    </div>
+  );
+}
+
+type ContactProps = Pick<
+  SectionFields,
+  "title" | "title1" | "subtitle1" | "description"
+>;
+
+export default function Contact({
+  title,
+  title1,
+  subtitle1,
+  description,
+}: ContactProps) {
+  // ✅ ТОЛЬКО из Contentful (никаких fallback-текстов)
+  const headingA = normalize(title);
+  const headingB = normalize(title1);
+  const intro = normalize(subtitle1);
+  const contactLines = splitLines(description);
+
+  // --- Form state (НЕ из Contentful) ---
   const [form, setForm] = useState<FormState>({
     firstName: "",
     lastName: "",
@@ -34,7 +128,7 @@ export default function Contact() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitState, setSubmitState] = useState<"idle" | "success" | "error">(
-    "idle"
+    "idle",
   );
 
   const validate = (values: FormState): FormErrors => {
@@ -85,7 +179,6 @@ export default function Contact() {
     return e;
   };
 
-  // оставляем (можно удалить, но пусть будет)
   useMemo(() => validate(form), [form]);
 
   const markTouched = (key: keyof FormState) =>
@@ -101,7 +194,7 @@ export default function Contact() {
     (
       ev:
         | React.ChangeEvent<HTMLInputElement>
-        | React.ChangeEvent<HTMLTextAreaElement>
+        | React.ChangeEvent<HTMLTextAreaElement>,
     ) => {
       const value = ev.target.value;
       const next = { ...form, [key]: value };
@@ -126,7 +219,6 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // показываем все ошибки при клике
     setTouched({
       firstName: true,
       lastName: true,
@@ -181,58 +273,45 @@ export default function Contact() {
     }
   };
 
+  const showTitleBlock = Boolean(headingA || headingB || intro);
+  const showContacts = contactLines.length > 0;
+
   return (
-    <div className=" bg-white px-6 py-0 md:py-20 lg:px-8 max-w-7xl mx-auto -mb-6">
+    <div className="bg-white px-6 py-10 md:py-20 lg:px-8 max-w-7xl mx-auto -mb-6">
       <div className="flex lg:flex-row flex-col items-start gap-12">
-        {/* title block left than center*/}
-        <div className="mx-auto max-w-2xl ">
-          <div className="lg:text-left text-center mx-auto">
-            <h2 className="text-balance text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
-              Реалізуйте ваш{" "}
-              <span className="block font-bold tracking-tight text-[#2c5cf2]">
-                {" "}
-                проєкт з iProk{" "}
-              </span>
-            </h2>
-            <p className="mt-7 text-lg/8 text-gray-600 text-balance">
-              Розкажіть про ваш проєкт — ми швидко оцінимо доцільність рішення та
-              підкажемо оптимальну конфігурацію.
-            </p>
-          </div>
-          <div className="bg-[#eceffa] p-8 max-w-80 lg:mt-40 lg:block hidden">
-            <h3 className="text-lg font-semibold text-gray-900">Контакти:</h3>
+        {/* title block (Contentful) */}
+        <div className="mx-auto max-w-2xl">
+          {showTitleBlock ? (
+            <div className="lg:text-left text-center mx-auto">
+              {(headingA || headingB) ? (
+                <h2 className="text-balance text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                  {headingA ? <>{headingA} </> : null}
+                  {headingB ? (
+                    <span className="block font-bold tracking-tight text-[#2c5cf2]">
+                      {headingB}
+                    </span>
+                  ) : null}
+                </h2>
+              ) : null}
 
-            <dl className="mt-3 space-y-3 text-lg text-gray-900">
-              <div>
-                <dt className="sr-only">Email</dt>
-                <dd>
-                  <a
-                    href="mailto:info@iprok.com.ua"
-                    className=" hover:text-[#2c5cf2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2c5cf2]"
-                    aria-label="Написати на email info@iprok.com.ua"
-                  >
-                    info@iprok.com.ua
-                  </a>
-                </dd>
-              </div>
+              {intro ? (
+                <p className="mt-7 text-lg/8 text-gray-600 text-balance whitespace-pre-line">
+                  {intro}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
 
-              <div>
-                <dt className="sr-only">Номер телефону</dt>
-                <dd>
-                  <a
-                    href="tel:+380000000000"
-                    className=" hover:text-[#2c5cf2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2c5cf2]"
-                    aria-label="Зателефонувати за номером +380 00 000 0000"
-                  >
-                    +380 00 000 0000
-                  </a>
-                </dd>
-              </div>
-            </dl>
-          </div>
+          {/* contacts (desktop) */}
+          {showContacts ? (
+            <ContactsBlock
+              lines={contactLines}
+              className="max-w-80 lg:mt-40 lg:block hidden"
+            />
+          ) : null}
         </div>
 
-        {/* form */}
+        {/* form (НЕ из Contentful) */}
         <form
           action="#"
           method="POST"
@@ -263,7 +342,7 @@ export default function Contact() {
                       ? "first-name-error"
                       : undefined
                   }
-                  className="block w-full  bg-white px-3.5 py-2 text-base text-gray-900 outline  -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:-outline-offset-2 focus:outline-[#2c5cf2]"
+                  className="block w-full bg-white px-3.5 py-2 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:-outline-offset-2 focus:outline-[#2c5cf2]"
                 />
                 {touched.firstName && errors.firstName && (
                   <p id="first-name-error" className="mt-1 text-sm text-red-600">
@@ -295,7 +374,7 @@ export default function Contact() {
                       ? "last-name-error"
                       : undefined
                   }
-                  className="block w-full  bg-white px-3.5 py-2 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline  focus:-outline-offset-2 focus:outline-[#2c5cf2]"
+                  className="block w-full bg-white px-3.5 py-2 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:-outline-offset-2 focus:outline-[#2c5cf2]"
                 />
                 {touched.lastName && errors.lastName && (
                   <p id="last-name-error" className="mt-1 text-sm text-red-600">
@@ -325,7 +404,7 @@ export default function Contact() {
                   aria-describedby={
                     touched.email && errors.email ? "email-error" : undefined
                   }
-                  className="block w-full  bg-white px-3.5 py-2 text-base text-gray-900 outline  -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline  focus:-outline-offset-2 focus:outline-[#2c5cf2]"
+                  className="block w-full bg-white px-3.5 py-2 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:-outline-offset-2 focus:outline-[#2c5cf2]"
                 />
                 {touched.email && errors.email && (
                   <p id="email-error" className="mt-1 text-sm text-red-600">
@@ -343,13 +422,11 @@ export default function Contact() {
                 Номер телефону
               </label>
               <div className="mt-2.5">
-                <div className="flex  bg-white outline -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-[#2c5cf2]">
-                  <div className="grid shrink-0 grid-cols-1 focus-within:relative"></div>
+                <div className="flex bg-white outline -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-[#2c5cf2]">
                   <input
                     id="phone-number"
                     name="phone-number"
                     type="text"
-                    placeholder="+380 00 000 0000"
                     value={form.phone}
                     onChange={onChangeText("phone")}
                     onBlur={onBlur("phone")}
@@ -385,11 +462,9 @@ export default function Contact() {
                   onBlur={onBlur("message")}
                   aria-invalid={Boolean(touched.message && errors.message)}
                   aria-describedby={
-                    touched.message && errors.message
-                      ? "message-error"
-                      : undefined
+                    touched.message && errors.message ? "message-error" : undefined
                   }
-                  className="block w-full  bg-white px-3.5 py-2 text-base text-gray-900 outline  -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline  focus:-outline-offset-2 focus:outline-[#2c5cf2]"
+                  className="block w-full bg-white px-3.5 py-2 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:-outline-offset-2 focus:outline-[#2c5cf2]"
                 />
                 {touched.message && errors.message && (
                   <p id="message-error" className="mt-1 text-sm text-red-600">
@@ -428,7 +503,7 @@ export default function Contact() {
                 >
                   Відправляючи цю форму, ви погоджуєтесь з нашою{" "}
                   <a
-                    href="#"
+                    href="/privacy-policy"
                     className="whitespace-nowrap font-semibold text-[#2c5cf2]"
                   >
                     політикою конфіденційності
@@ -447,7 +522,8 @@ export default function Contact() {
           <div className="mt-5">
             <button
               type="submit"
-              className="block w-full  bg-[#2c5cf2] px-4 py-3 text-center  font-semibold text-white shadow-sm hover:bg-[#2c5cf2] focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#2c5cf2] text-2xl tracking-tight "
+              className="block w-full bg-[#2c5cf2] px-4 py-3 text-center font-semibold text-white shadow-sm hover:bg-[#2c5cf2] focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#2c5cf2] text-2xl tracking-tight"
+              disabled={isSubmitting}
             >
               {isSubmitting ? "Відправляємо..." : "Отримати консультацію"}
             </button>
@@ -467,37 +543,12 @@ export default function Contact() {
         </form>
 
         {/* contacts block for mobile */}
-        <div className="bg-[#eceffa] p-8 md:w-xl w-full mx-auto block lg:hidden">
-          <h3 className="text-lg font-semibold text-gray-900">Контакти:</h3>
-
-          <dl className="mt-2 space-y-2 text-lg text-gray-900">
-            <div>
-              <dt className="sr-only">Email</dt>
-              <dd>
-                <a
-                  href="mailto:info@iprok.com.ua"
-                  className=" hover:text-[#2c5cf2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2c5cf2]"
-                  aria-label="Написати на email info@iprok.com.ua"
-                >
-                  info@iprok.com.ua
-                </a>
-              </dd>
-            </div>
-
-            <div>
-              <dt className="sr-only">Номер телефону</dt>
-              <dd>
-                <a
-                  href="tel:+380000000000"
-                  className=" hover:text-[#2c5cf2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2c5cf2]"
-                  aria-label="Зателефонувати за номером +380 00 000 0000"
-                >
-                  +380 00 000 0000
-                </a>
-              </dd>
-            </div>
-          </dl>
-        </div>
+        {showContacts ? (
+          <ContactsBlock
+            lines={contactLines}
+            className="md:w-xl w-full mx-auto block lg:hidden"
+          />
+        ) : null}
       </div>
     </div>
   );

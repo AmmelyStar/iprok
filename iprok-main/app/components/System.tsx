@@ -1,259 +1,230 @@
-// import Image from "next/image";
-
-// const features = [
-//   {
-//     name: "Мінеральна вата",
-//     description:
-//       "Негорюча, добре гасить звук і стабільно працює в широкому діапазоні температур.",
-//     icon: "/img/001.png",
-//   },
-//   {
-//     name: "Піноізол",
-//     description:
-//       "Легкий матеріал для заповнення порожнин: мінімізує пустоти й підвищує рівномірність утеплення.",
-//     icon: "/img/002.png",
-//   },
-//   {
-//     name: "Пінополіуретан",
-//     description:
-//       "Щільне заповнення та висока теплоізоляція — для задач, де важливий максимум енергоефективності.",
-//     icon: "/img/003.png",
-//   },
-//   {
-//     name: "Ековата",
-//     description:
-//       "Целюлозний утеплювач, який добре заповнює порожнини й підходить для “теплих” рішень.",
-//     icon: "/img/004.png",
-//   },
-//   {
-//     name: "Інші сучасні ізоляційні матеріали",
-//     description:
-//       "Система адаптується під ТЗ: підбираємо утеплення під вимоги об’єкта та бюджету.",
-//     icon: "/img/005.png",
-//   },
-// ];
-
-// export default function System() {
-//   return (
-//     <section className="bg-white py-20 sm:py-28">
-//       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-//         {/* TOP TITLE */}
-//         <div className="mx-auto max-w-3xl text-center">
-//           <h2 className="text-pretty text-4xl font-bold tracking-tight text-black sm:text-6xl">
-//             Це не каркасний будинок.
-//             <span className="text-[#2c5cf2] block mt-3">
-//               Це інженерна екосистема.
-//             </span>
-//           </h2>
-//           <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg/8 text-gray-900">
-//             iProk — це цілісна система, де каркас, утеплення та обшивка працюють
-//             як єдиний моноліт.
-//           </p>
-//         </div>
-
-//         {/* MAIN */}
-//         <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start">
-//           {/* LEFT: IMAGE */}
-//           <div className="lg:col-span-6">
-//             <div className="relative overflow-hidden bg-gray-50">
-//               <Image
-//                 src="/img/4.jpg"
-//                 alt="Зразок системи iProk"
-//                 width={1400}
-//                 height={1000}
-//                 className="h-auto w-full object-cover"
-//                 priority
-//               />
-//             </div>
-//           </div>
-
-//           {/* RIGHT: TEXT + LIST */}
-//           <div className="lg:col-span-6">
-//             {/* NEW TEXTS (как в референсе) */}
-//             <div className="mb-10">
-//               <h3 className="text-pretty text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-//                 Адаптивність теплоізоляції під вимоги{" "}
-//                 <span className="block">конкретного проєкту.</span>
-//               </h3>
-
-//               <p className="mt-4 text-base leading-7 text-gray-600">
-//                 Система не обмежена одним типом утеплювача. Після монтажу
-//                 каркасу конструкція адаптується під технічне завдання.
-//               </p>
-//             </div>
-
-//             <p className="mb-6 inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-[#2c5cf2] uppercase">
-//               <span className="h-px w-8 bg-[#2c5cf2]/70" aria-hidden="true" />
-//               Варіанти утеплювача
-//             </p>
-
-//             {/* FEATURES */}
-//             <dl className="space-y-8">
-//               {features.map((feature) => (
-//                 <div key={feature.name} className="flex gap-5">
-//                   {/* icon */}
-//                   <div className="flex-none">
-//                     <div className="relative h-12 w-12 overflow-hidden bg-gray-100">
-//                       <Image
-//                         src={feature.icon}
-//                         alt=""
-//                         fill
-//                         sizes="48px"
-//                         className="object-cover"
-//                         aria-hidden="true"
-//                       />
-//                     </div>
-//                   </div>
-
-//                   {/* text */}
-//                   <div>
-//                     <dt className="font-semibold text-gray-900">
-//                       {feature.name}
-//                     </dt>
-//                     <dd className="mt-2 text-base leading-7 text-gray-600">
-//                       {feature.description}
-//                     </dd>
-//                   </div>
-//                 </div>
-//               ))}
-//             </dl>
-
-//             {/* BOTTOM NOTE + BADGE */}
-//             <div className="mt-10 space-y-4">
-//               <p className="text-base leading-7 text-gray-600">
-//                 Модулі з&apos;єднуються листовими матеріалами, формуючи жорстку
-//                 та стабільну конструкцію з прогнозованими властивостями.
-//               </p>
-
-//               <div className="inline-flex items-center gap-3 border border-[#2c5cf2]/40 bg-[#2c5cf2]/5 px-4 py-3">
-//                 <span
-//                   className="inline-flex h-9 w-9 items-center justify-center bg-white ring-1 ring-[#2c5cf2]/20"
-//                   aria-hidden="true"
-//                 >
-//                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-//                     <path
-//                       d="M12 2l3 6 6 .9-4.5 4.4 1.1 6.2L12 16.9 6.4 19.5l1.1-6.2L3 8.9 9 8l3-6z"
-//                       stroke="#2c5cf2"
-//                       strokeWidth="1.6"
-//                       strokeLinejoin="round"
-//                     />
-//                   </svg>
-//                 </span>
-
-//                 <p className="text-sm font-medium text-gray-800">
-//                   Екологічно безпечний склад профілю та утеплювача.
-//                 </p>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
 import Image from "next/image";
+import type { SectionFields } from "../types/contentful";
 
-const features = [
-  {
-    name: "Мінеральна вата",
-    description:
-      "Негорюча, добре гасить звук і стабільно працює в широкому діапазоні температур.",
-    icon: "/img/001.png",
-  },
-  {
-    name: "Піноізол",
-    description:
-      "Легкий матеріал для заповнення порожнин: мінімізує пустоти й підвищує рівномірність утеплення.",
-    icon: "/img/002.png",
-  },
-  {
-    name: "Пінополіуретан",
-    description:
-      "Щільне заповнення та висока теплоізоляція — для задач, де важливий максимум енергоефективності.",
-    icon: "/img/003.png",
-  },
-  {
-    name: "Ековата",
-    description:
-      "Целюлозний утеплювач, який добре заповнює порожнини й підходить для “теплих” рішень.",
-    icon: "/img/004.png",
-  },
-  {
-    name: "Інші сучасні ізоляційні матеріали",
-    description:
-      "Система адаптується під ТЗ: підбираємо утеплення під вимоги об’єкта та бюджету.",
-    icon: "/img/005.png",
-  },
+import {
+  BLOCKS,
+  INLINES,
+  MARKS,
+  type Document,
+  type TopLevelBlock,
+  type UnorderedList,
+  type ListItem,
+  type Paragraph,
+  type Text,
+  type Block,
+  type Inline,
+} from "@contentful/rich-text-types";
+
+import {
+  documentToReactComponents,
+  type Options,
+} from "@contentful/rich-text-react-renderer";
+
+type Feature = { name: string; description: string; icon: string };
+
+type SystemProps = Pick<
+  SectionFields,
+  "title" | "title1" | "subtitle1" | "subtitle2" | "description" | "description2"
+> & {
+  richText?: Document; // правая колонка
+  richText1?: Document; // список утепления (bullets)
+  featuresTitle?: string;
+  imageSrc?: string;
+};
+
+const FEATURE_ICONS = [
+  "/img/001.webp",
+  "/img/002.webp",
+  "/img/003.webp",
+  "/img/004.webp",
+  "/img/005.webp",
 ];
 
-export default function System() {
+const richTextOptions: Options = {
+  renderMark: {
+    [MARKS.BOLD]: (text) => <b className="font-semibold text-slate-800">{text}</b>,
+  },
+  renderNode: {
+    [BLOCKS.PARAGRAPH]: (_node, children) => (
+      <p className="mt-6 text-lg/8 text-slate-600 first:mt-0">{children}</p>
+    ),
+    [INLINES.HYPERLINK]: (node, children) => (
+      <a
+        href={node.data.uri}
+        className="underline underline-offset-4"
+        target="_blank"
+        rel="noreferrer"
+      >
+        {children}
+      </a>
+    ),
+  },
+};
+
+function isUnorderedList(node: TopLevelBlock): node is UnorderedList {
+  return node.nodeType === BLOCKS.UL_LIST;
+}
+
+function isListItem(node: Block | Inline): node is ListItem {
+  return node.nodeType === BLOCKS.LIST_ITEM;
+}
+
+function isParagraph(node: Block | Inline): node is Paragraph {
+  return node.nodeType === BLOCKS.PARAGRAPH;
+}
+
+function isText(node: Block | Inline | Text): node is Text {
+  return (node as Text).nodeType === "text";
+}
+
+function parseFeaturesFromRichText(doc?: Document): Feature[] {
+  if (!doc) return [];
+
+  const top = doc.content as TopLevelBlock[];
+  const ul = top.find(isUnorderedList);
+  if (!ul) return [];
+
+  const items = ul.content.filter(isListItem);
+
+  return items.map((li, index) => {
+    const p = li.content.find(isParagraph);
+    const nodes = p ? p.content : [];
+
+    let title = "";
+    let desc = "";
+
+    for (const n of nodes) {
+      if (!isText(n)) continue;
+
+      const value = n.value ?? "";
+      const isBold = (n.marks ?? []).some((m) => m.type === "bold");
+
+      if (isBold) title += value;
+      else desc += value;
+    }
+
+    desc = desc.replace(/^—\s*/, "").trim();
+
+    return {
+      name: title.trim(),
+      description: desc,
+      icon: FEATURE_ICONS[index] ?? FEATURE_ICONS[FEATURE_ICONS.length - 1],
+    };
+  });
+}
+
+export default function System({
+  title,
+  title1,
+  subtitle1,
+  subtitle2,
+  description,
+    description2,
+  richText,
+  richText1,
+  imageSrc = "/img/w.webp",
+
+}: SystemProps) {
+  const features = parseFeaturesFromRichText(richText1);
+
   return (
-    <section className="bg-white py-20 sm:py-28">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Title + subtitle */}
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-pretty text-4xl font-bold tracking-tight text-black sm:text-6xl">
-            Це не каркасний будинок.
-            <span className="text-[#2c5cf2] block mt-3">
-              Це інженерна екосистема.
-            </span>
+    <section id="system" className="bg-white py-14 sm:pt-20">
+      <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
+        {/* Title */}
+        <div className="mx-auto max-w-4xl text-center">
+          <h2 className="text-pretty text-3xl font-bold tracking-tight text-black sm:text-5xl">
+            {title}
+            <span className="mt-3 block text-[#2c5cf2]">{title1}</span>
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg/8 text-gray-900">
-            iProk — це цілісна система, де каркас, утеплення та обшивка працюють
-            як єдиний моноліт.
-          </p>
         </div>
 
-        {/* Main layout */}
-        <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start">
+        {/* Text block */}
+        <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-x-12">
+          {/* LEFT */}
+          <div>
+            <h3 className="text-pretty text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+              {subtitle1}
+            </h3>
+
+            <p className="mt-6 text-lg/8 text-slate-600">{subtitle2}</p>
+
+            {description ? (
+              <div className="mt-4 flex items-center gap-4">
+                <Image
+                  src="/img/eco_safe_icon_512_final.webp"
+                  alt="Екологічно безпечні матеріали"
+                  width={64}
+                  height={64}
+                />
+                <p className="font-semibold text-[#003fdd] whitespace-pre-line">
+                  {description}
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          {/* RIGHT */}
+          <div>
+            {richText ? (
+              <div>{documentToReactComponents(richText, richTextOptions)}</div>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Image + list */}
+        <div className="mt-16 grid grid-cols-1 place-items-center gap-10 lg:grid-cols-2 lg:gap-x-12 lg:place-items-stretch">
           {/* LEFT: image */}
-          <div className="lg:col-span-6">
-            <div className="relative overflow-hidden bg-gray-50">
+          <div className="w-full">
+            <div className="relative mx-auto flex justify-center overflow-hidden lg:-mt-20">
               <Image
-                src="/img/4.jpg" // ✅ public/img/4.jpg
+                src={imageSrc}
                 alt="Зразок системи iProk"
                 width={1200}
-                height={900}
-                className="h-auto w-full object-cover"
+                height={400}
+                className="h-auto w-full max-w-2xl object-contain"
                 priority
               />
             </div>
           </div>
 
           {/* RIGHT: list */}
-          <div className="lg:col-span-6">
-            <dl className="space-y-8">
-              {features.map((feature) => (
-                <div key={feature.name} className="flex gap-5">
-                  {/* icon */}
-                  <div className="flex-none">
-                    <div className="relative h-12 w-12 overflow-hidden bg-gray-100">
-                      <Image
-                        src={feature.icon}
-                        alt="" // декоративно, название рядом
-                        fill
-                        className="object-cover"
-                        sizes="48px"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  </div>
+          <div className="mx-auto w-full max-w-4xl lg:mx-0">
+            <p className="mb-6 text-center text-3xl font-semibold tracking-tight text-[#2c5cf2] lg:text-left">
+              {  description2}
+            </p>
 
-                  {/* text */}
-                  <div>
-                    <dt className="font-semibold text-gray-900">
+            <dl className="w-full space-y-5">
+              {features.map((feature) => (
+                <div key={feature.name} className="w-full">
+                  <dt className="flex items-center gap-5">
+                    <span className="flex-none">
+                      <span className="relative block h-12 w-12 overflow-hidden bg-gray-100">
+                        <Image
+                          src={feature.icon}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          sizes="48px"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </span>
+
+                    <span className="text-2xl font-semibold tracking-tight text-gray-900">
                       {feature.name}
-                    </dt>
-                    <dd className="mt-2 text-base leading-7 text-gray-600">
-                      {feature.description}
-                    </dd>
-                  </div>
+                    </span>
+                  </dt>
+
+                  <dd className="mt-2 pl-17 text-base leading-7 text-slate-600">
+                    {feature.description}
+                  </dd>
                 </div>
               ))}
             </dl>
           </div>
         </div>
+
+        <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg/8 text-gray-900" />
       </div>
     </section>
   );

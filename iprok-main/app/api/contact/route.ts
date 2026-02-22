@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     if (!receiver) {
       return NextResponse.json(
         { error: "CONTACT_RECEIVER_EMAIL is missing" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     if (!email) {
       return NextResponse.json(
         { error: "User email is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,6 +63,9 @@ export async function POST(req: Request) {
 
         <p>Гарного дня!<br/>
         Команда <b>iProk</b></p>
+
+        <p>+38 096 812 9544</p>
+        <p>м. Біла Церква, вул. Шептицького, 49</p>
       `,
     });
 
@@ -71,7 +74,7 @@ export async function POST(req: Request) {
     console.error("CONTACT API ERROR:", error);
     return NextResponse.json(
       { error: "Failed to send email" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

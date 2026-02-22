@@ -7,38 +7,82 @@ import {
   Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 
+import type { SectionFields } from "../types/contentful";
+import {
+  BLOCKS,
+  type Document,
+  type TopLevelBlock,
+  type UnorderedList,
+  type ListItem,
+  type Paragraph,
+  type Text,
+  type Block,
+  type Inline,
+} from "@contentful/rich-text-types";
+
 type Feature = {
   name: string;
   description: string;
   icon: ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
-const features: Feature[] = [
-  {
-    name: "Несуча здатність",
-    description:
-      "Силовий каркас: потужне внутрішнє армування бере на себе навантаження та зберігає форму конструкції.",
-    icon: BoltIcon,
-  },
-  {
-    name: "Жодних містків холоду",
-    description:
-      "Без “холодних зон”: пластик не проводить холод у конструкцію — комфортні стіни без конденсату та промерзання.",
-    icon: ShieldCheckIcon,
-  },
-  {
-    name: "Терморозрив",
-    description:
-      "Тепло всередині: комбінація пластику та повітряних камер зменшує тепловтрати й підвищує енергоефективність.",
-    icon: SunIcon,
-  },
-  {
-    name: "Геометрія",
-    description:
-      "Точність, що прискорює монтаж: стабільна геометрія профілю дає щільні стики та менше підгонки на об’єкті.",
-    icon: Squares2X2Icon,
-  },
-];
+type DNAProps = Pick<SectionFields, "title" | "subtitle1"> & {
+  richText1?: Document; // список из 4 пунктов
+  imageSrc?: string;
+};
+
+const ICONS = [BoltIcon, ShieldCheckIcon, SunIcon, Squares2X2Icon];
+
+function isUnorderedList(node: TopLevelBlock): node is UnorderedList {
+  return node.nodeType === BLOCKS.UL_LIST;
+}
+
+function isListItem(node: Block | Inline): node is ListItem {
+  return node.nodeType === BLOCKS.LIST_ITEM;
+}
+
+function isParagraph(node: Block | Inline): node is Paragraph {
+  return node.nodeType === BLOCKS.PARAGRAPH;
+}
+
+function isText(node: Block | Inline | Text): node is Text {
+  return (node as Text).nodeType === "text";
+}
+
+function parseFeaturesFromRichText(doc?: Document): Omit<Feature, "icon">[] {
+  if (!doc) return [];
+
+  const top = doc.content as TopLevelBlock[];
+  const ul = top.find(isUnorderedList);
+  if (!ul) return [];
+
+  const items = ul.content.filter(isListItem);
+
+  return items.map((li) => {
+    const p = li.content.find(isParagraph);
+    const nodes = p ? p.content : [];
+
+    let title = "";
+    let desc = "";
+
+    for (const n of nodes) {
+      if (!isText(n)) continue;
+
+      const value = n.value ?? "";
+      const isBold = (n.marks ?? []).some((m) => m.type === "bold");
+
+      if (isBold) title += value;
+      else desc += value;
+    }
+
+    desc = desc.replace(/^—\s*/, "").trim();
+
+    return {
+      name: title.trim(),
+      description: desc,
+    };
+  });
+}
 
 type FeatureItemProps = {
   feature: Feature;
@@ -53,35 +97,42 @@ function FeatureItem({ feature, align = "left" }: FeatureItemProps) {
     align === "right" ? "justify-start" : "justify-start lg:justify-end";
 
   return (
-    <div className={`flex ${rowJustify}`}>
-      <div
-        className={`flex gap-4 ${
-          align === "right" ? "flex-row" : "flex-row lg:flex-row-reverse"
-        }`}
-      >
-        <span className="mt-1 inline-flex h-8 w-8 flex-none items-center justify-center">
-          <Icon className="h-7 w-7 text-[#2c5cf2]" aria-hidden="true" />
-        </span>
+    <>
+      <dt className={`flex ${rowJustify}`}>
+        <div
+          className={`flex gap-4 ${
+            align === "right" ? "flex-row" : "flex-row lg:flex-row-reverse"
+          }`}
+        >
+          <span className="mt-1 inline-flex h-8 w-8 flex-none items-center justify-center">
+            <Icon className="h-7 w-7 text-[#2c5cf2]" aria-hidden="true" />
+          </span>
 
-        <div className={`max-w-md ${textAlign}`}>
-          <dt className="text-3xl font-semibold tracking-tight text-gray-900">
+          <span
+            className={`max-w-md ${textAlign} text-3xl font-semibold tracking-tight text-gray-900`}
+          >
             {feature.name}
-          </dt>
-          <dd className="mt-2 text-base leading-7 text-gray-600">
-            {feature.description}
-          </dd>
+          </span>
         </div>
-      </div>
-    </div>
+      </dt>
+
+      <dd className={`mt-2 flex ${rowJustify}`}>
+        <div className={`max-w-md ${textAlign}`}>
+          <p className="text-base leading-7 text-slate-600">
+            {feature.description}
+          </p>
+        </div>
+      </dd>
+    </>
   );
 }
 
-function CenterImage() {
+function CenterImage({ imageSrc }: { imageSrc: string }) {
   return (
     <div className="flex justify-center">
-      <div className="w-full max-w-xl lg:max-w-md overflow-hidden bg-gray-50">
+      <div className="w-full max-w-xl overflow-hidden bg-gray-50 lg:max-w-md">
         <Image
-          src="/img/dna2.jpg"
+          src={imageSrc}
           alt="Профіль iProk"
           width={900}
           height={900}
@@ -93,33 +144,47 @@ function CenterImage() {
   );
 }
 
-export default function DNA() {
+export default function DNA({
+  title,
+  subtitle1,
+  richText1,
+  imageSrc = "/img/dna2.webp",
+}: DNAProps) {
+  const parsed = parseFeaturesFromRichText(richText1);
+
+  const features: Feature[] = parsed.slice(0, 4).map((f, idx) => ({
+    ...f,
+    icon: ICONS[idx] ?? Squares2X2Icon,
+  }));
+
   const [f1, f2, f3, f4] = features;
 
   return (
-    <section className="bg-white px-6 py-20 sm:py-28 lg:px-8">
+    <section id="constructive" className="bg-white px-6 pt-8 pb-16 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-pretty text-4xl font-bold tracking-tight text-black sm:text-5xl">
-            Конструктивна ДНК iProk
+            {title}
           </h2>
-          <p className="mt-4 text-pretty text-lg font-medium text-gray-700 sm:text-xl">
-            Каркас, що тримає навантаження й економить тепло
-          </p>
+          {subtitle1 ? (
+            <p className="mt-4 text-pretty text-lg font-medium text-slate-700 sm:text-xl">
+              {subtitle1}
+            </p>
+          ) : null}
         </div>
 
         {/* MOBILE */}
         <div className="mt-14 space-y-12 md:hidden">
           <dl className="grid gap-10">
-            <FeatureItem feature={f1} />
-            <FeatureItem feature={f2} />
+            {f1 ? <FeatureItem feature={f1} /> : null}
+            {f2 ? <FeatureItem feature={f2} /> : null}
           </dl>
 
-          <CenterImage />
+          <CenterImage imageSrc={imageSrc} />
 
           <dl className="grid gap-10">
-            <FeatureItem feature={f3} />
-            <FeatureItem feature={f4} />
+            {f3 ? <FeatureItem feature={f3} /> : null}
+            {f4 ? <FeatureItem feature={f4} /> : null}
           </dl>
         </div>
 
@@ -132,24 +197,24 @@ export default function DNA() {
           </dl>
 
           <div className="mt-12">
-            <CenterImage />
+            <CenterImage imageSrc={imageSrc} />
           </div>
         </div>
 
         {/* DESKTOP */}
         <div className="mt-14 hidden lg:grid lg:grid-cols-12 lg:items-center lg:gap-12">
           <dl className="grid gap-10 lg:col-span-4">
-            <FeatureItem feature={f1} align="left" />
-            <FeatureItem feature={f2} align="left" />
+            {f1 ? <FeatureItem feature={f1} align="left" /> : null}
+            {f2 ? <FeatureItem feature={f2} align="left" /> : null}
           </dl>
 
           <div className="lg:col-span-4">
-            <CenterImage />
+            <CenterImage imageSrc={imageSrc} />
           </div>
 
           <dl className="grid gap-10 lg:col-span-4">
-            <FeatureItem feature={f3} align="right" />
-            <FeatureItem feature={f4} align="right" />
+            {f3 ? <FeatureItem feature={f3} align="right" /> : null}
+            {f4 ? <FeatureItem feature={f4} align="right" /> : null}
           </dl>
         </div>
       </div>
